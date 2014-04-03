@@ -9,6 +9,7 @@
   },
   "permissions": [
     "location",
+    "notifications",
     "https://track-dev.schultetwins.com/"
   ],
   "bluetooth" : {}
