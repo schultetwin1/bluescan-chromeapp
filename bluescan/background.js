@@ -21,7 +21,12 @@ chrome.app.runtime.onLaunched.addListener(function() {
 
   /* Resume BT scanning on power cycle */
   chrome.bluetooth.getAdapterState(function(adapter) {
-    powered = adapter.powered;
+    if (!adapter) {
+      console.log("No adapter found");
+      powered = false;
+    } else {
+      powered = adapter.powered;
+    }
   });
   chrome.bluetooth.onAdapterStateChanged.addListener(
     function(adapter) {
@@ -89,8 +94,6 @@ var updateDeviceName = function(device) {
   chrome.notifications.create("", opt, function(id){ console.log(id); });
 
   var data = new FormData();
-
-  xhr.open("POST", "https://track-dev.schultetwins.com/api/v1.0/spot",true);
 
   data.append("MAC", MAC);
   data.append("rand_mac", "1");
