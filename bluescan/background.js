@@ -59,18 +59,18 @@ chrome.runtime.onSuspend.addListener(function() {
 
 var queueRequest = function(xhr_data) {
   queued_requests.push(xhr_data);
-  if (navigator.online) {
+    console.log("Online");
     while (queued_requests.length != 0) {
       var xhr = new XMLHttpRequest();
+      xhr.open("POST", "https://track-dev.schultetwins.com/api/v1.0/spot", true);
 
-      data = queued_request.shift();
+      data = queued_requests.shift();
 
       xhr.onload = function () {
         console.log(this.responseText);
       }
-      req.send(data);
+      xhr.send(data);
     }
-  }
 }
 
 
@@ -101,7 +101,7 @@ var updateDeviceName = function(device) {
   data.append("latitude", loc.coords.latitude.toString());
   data.append("longitude", loc.coords.longitude.toString());
   data.append("device", "computer");
-  data.append("fitibitid", MAC);
+  data.append("fitbitid", MAC);
   data.append("passcode", "test_site");
   data.append("name", "Matt");
 
