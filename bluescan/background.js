@@ -2,6 +2,7 @@
 var loc = null;
 var powered = false;
 var device_names = {};
+var queued_requests = [];
 
 /* Open the page */
 chrome.app.runtime.onLaunched.addListener(function() {
@@ -51,35 +52,58 @@ chrome.runtime.onSuspend.addListener(function() {
   chrome.bluetooth.stopDiscovery(function () {});
 });
 
+var queueRequest = function(xhr_data) {
+  queued_requests.push(xhr_data);
+  if (navigator.online) {
+    while (queued_requests.length != 0) {
+      var xhr = new XMLHttpRequest();
+
+      data = queued_request.shift();
+
+      xhr.onload = function () {
+        console.log(this.responseText);
+      }
+      req.send(data);
+    }
+  }
+}
+
 
 var updateDeviceName = function(device) {
   if (loc == null) return;
 
+  var fitbit_names = ["Flex", "Force", "One"];
+
+  // Only uploading fitbits for now....
+  // @TODO: Find a better way of filtering. By vendor id or so
+  if (fitbit_names.indexOf(device.name) == -1) return;
+
+  var  MAC = device.address.toUpperCase().replace(/-/g, ":");
+
   var opt = {
     type: "basic",
-    title: "Scanned BLE Device",
-    message: "Found " + device.name,
+    title: "Scanned a Fitbit Device",
+    message: "Found " + device.name + " (" + MAC + ")",
     iconUrl: "icon.png"
   }
   chrome.notifications.create("", opt, function(id){ console.log(id); });
 
-  var xhr = new XMLHttpRequest();
   var data = new FormData();
 
   xhr.open("POST", "https://track-dev.schultetwins.com/api/v1.0/spot",true);
 
-  data.append("MAC", device.address.toUpperCase().replace(/-/g, ":"));
+  data.append("MAC", MAC);
+  data.append("rand_mac", "1");
   data.append("timestamp", (Math.floor(Date.now() / 1000)).toString());
   data.append("latitude", loc.coords.latitude.toString());
   data.append("longitude", loc.coords.longitude.toString());
   data.append("device", "computer");
+  data.append("fitibitid", MAC);
   data.append("passcode", "test_site");
+  data.append("name", "Matt");
 
-  xhr.onload = function () {
-    console.log(this.responseText);
-  }
 
-  xhr.send(data);
+  queueRequest(data);
   device_names[device.address] = device.name;
 };
 
