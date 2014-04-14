@@ -10,7 +10,10 @@
   "permissions": [
     "location",
     "notifications",
-    "https://track-dev.schultetwins.com/"
+    "https://track-dev.schultetwins.com/",
+    "https://track.schultetwins.com/",
+    "http://track-dev.schultetwins.com/",
+    "http://track.schultetwins.com/"
   ],
   "bluetooth" : {}
 }
